@@ -1,5 +1,9 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg)
 
+# PRESENT Cipher TT2 submission
+
+A submission to the second run of the Tiny Tapeout. The design implements a part of the [PRESENT cipher](https://link.springer.com/chapter/10.1007/978-3-540-74735-2_31).
+
 # What is Tiny Tapeout?
 
 TinyTapeout is an educational project that aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip!
