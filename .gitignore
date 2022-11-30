@@ -1,1 +1,3 @@
 src/user_config.tcl
+sim/tt02-fosfor-present
+sim/fosfor_present_top_tb.vcd
