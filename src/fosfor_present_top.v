@@ -1,6 +1,8 @@
 `default_nettype none
 `timescale 1ns/1ps
 
+// `define TEST_REG
+
 module fosfor_present_top (
   input [7:0] io_in,
   output [7:0] io_out
@@ -37,7 +39,7 @@ module fosfor_present_top (
       ...
       7 - plain text 63:56
       
-      0x08 - test register, write/read
+      0x08 - test register, write/read (only if TEST_REG defined)
       
       0x10 - key 7:0 writing only
       ...
@@ -93,7 +95,9 @@ module fosfor_present_top (
   // second stage registes, addressing
   // ********************************************************
 
+`ifdef TEST_REG
   reg [7:0] TestRegister_b;
+`endif
   reg [63:0] PlainText_b;
   reg [79:0] Key_b;
   wire [63:0] CipherText_b;
@@ -110,8 +114,10 @@ module fosfor_present_top (
         'h05: PlainText_b[47:40] = InputData_b;
         'h06: PlainText_b[55:48] = InputData_b;
         'h07: PlainText_b[63:56] = InputData_b;
-        
+
+`ifdef TEST_REG
         'h08: TestRegister_b = InputData_b;
+`endif
       
         'h10: Key_b[ 7: 0] = InputData_b;
         'h11: Key_b[15: 8] = InputData_b;
@@ -140,7 +146,9 @@ module fosfor_present_top (
         'h06: OutputData_b = CipherText_b[55:48];
         'h07: OutputData_b = CipherText_b[63:56];
         
+`ifdef TEST_REG
         'h08: OutputData_b = TestRegister_b;
+`endif
       endcase
     end
   end

@@ -4,6 +4,8 @@
 //`define DEBUG
 `define LOG
 
+//`define TEST_TEST_REG
+
 module fosfor_present_top_tb;
 
   localparam ADDR_IDLE = 2'b00;
@@ -170,7 +172,7 @@ module fosfor_present_top_tb;
     integer timeout;
 
     readStatus(data8);
-    if (data8[0] != 1) err("PRESENT not ready!");
+    if (data8[0] !== 1) err("PRESENT not ready!");
 
     // writeKey('h1234567890ABCDEF00AA);
     // writePlainText('h1122334455667788);
@@ -178,10 +180,10 @@ module fosfor_present_top_tb;
     writePlainText(0);
 
     readStatus(data8);
-    if (data8[0] != 1) err("PRESENT not ready!");
+    if (data8[0] !== 1) err("PRESENT not ready!");
     startPRESENT();
     readStatus(data8);
-    if (data8[0] == 1) err("PRESENT ready and not processing!");
+    if (data8[0] === 1) err("PRESENT ready and not processing!");
 
     timeout = 350; // should be done in 320 ns (31+1 rounds at 10ns clock)
     while (!data8[0]) begin
@@ -192,7 +194,7 @@ module fosfor_present_top_tb;
     end
 
     readCipherText(data64);
-    if (data64 != 64'h5579C1387B228445) err("PRESENT calculated wrongly!");
+    if (data64 !== 64'h5579C1387B228445) err("PRESENT calculated wrongly!");
   end
   endtask
 
@@ -208,12 +210,13 @@ module fosfor_present_top_tb;
     @(negedge Reset_r);
     @(posedge Clk_k);
 
+`ifdef TEST_TEST_REG
     // test test register write/read
     write(8, 'hA5);
     read(8, data8);
-    if (data8 != 'hA5) err("wrong test register read!");
-
+    if (data8 !== 'hA5) err("wrong test register read!");
     #20;
+`endif
 
     // test PRESENT
     testPRESENT();
