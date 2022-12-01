@@ -3,6 +3,11 @@
 project:
   wokwi_id:    0        # If using wokwi, set this to your project's ID
   source_files:        # If using an HDL, set wokwi_id as 0 and uncomment and list your source files here. Source files must be in ./src
+    - register.v
+    - present/s_box.v
+    - present/data_update.v
+    - present/key_update.v
+    - present/core_serial.v
     - fosfor_present_top.v
   top_module:  "fosfor_present_top"      # put the name of your top module here, make it unique by prepending your github username
 

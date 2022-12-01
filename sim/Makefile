@@ -1,12 +1,12 @@
 PROJECT := tt02-fosfor-present
 TOP_MODULE := fosfor_present_top
 RTL_SRC := \
-	../src/$(TOP_MODULE).v \
 	../src/register.v \
 	../src/present/s_box.v \
 	../src/present/data_update.v \
 	../src/present/key_update.v \
 	../src/present/core_serial.v \
+	../src/$(TOP_MODULE).v \
 	
 TB_SRC := $(TOP_MODULE)_tb.v
 SRC := $(RTL_SRC) $(TB_SRC)
