@@ -6,7 +6,7 @@ module fosfor_present_top_tb;
   initial begin
     $dumpfile ("fosfor_present_top_tb.vcd");
     $dumpvars (0, fosfor_present_top_tb);
-    #500;
+    #1000;
     $finish();
   end
 
@@ -14,9 +14,12 @@ module fosfor_present_top_tb;
   reg Reset_r;
   
   initial begin
-    Clk_k = 0;
     Reset_r = 1;
-    #10 Reset_r = 0;
+    #20 Reset_r = 0;
+  end
+
+  initial begin
+    Clk_k = 0;
     forever 
        #5 Clk_k = ~Clk_k;
   end

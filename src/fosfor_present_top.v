@@ -1,3 +1,6 @@
+`default_nettype none
+`timescale 1ns/1ps
+
 module fosfor_present_top (
   input [7:0] io_in,
   output [7:0] io_out
@@ -27,6 +30,26 @@ module fosfor_present_top (
   wire [7:0] InputData_b;
   wire [7:0] OutputData_b;
   
-  
+  wire [63:0] PlainText_b = 0;
+  wire [79:0] Key_b = 1;
+  wire [63:0] CipherText_b;
+
+  wire Start = 1;
+  wire Ready;
+
+  assign Status_b = {6'b0, Ready};
+
+  core_serial i_present (
+    .Clk_ik(Clk_ik),
+    .Reset_ir(Reset_ir),
+    // crypto
+    .PlainText_ib(PlainText_b),
+    .Key_ib(Key_b),
+    .CipherText_ob(CipherText_b),
+    // controls
+    .Start_i(Start),
+    .Ready_o(Ready)
+  );
+
 
 endmodule
