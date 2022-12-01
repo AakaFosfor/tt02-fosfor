@@ -26,7 +26,7 @@ module fosfor_present_top (
       11 - write to input_data[7:4] register, output output_data register
       
       command (self clearing):
-      bit 0 - write address from input
+      bit 0 - latch address from input
       bit 1 - read register
       bit 2 - write register
       bit 3 - start PRESENT engine
@@ -50,7 +50,7 @@ module fosfor_present_top (
   // ********************************************************
   
   reg [3:0] Command_b; // self-clearing
-  wire CommandWriteAddress;
+  wire CommandLatchAddress;
   wire CommandRead;
   wire CommandWrite;
   wire CommandStart;
@@ -59,7 +59,7 @@ module fosfor_present_top (
   reg [7:0] OutputData_b;
   reg [7:0] RegAddress_b;
   
-  assign CommandWriteAddress = Command_b[0];
+  assign CommandLatchAddress = Command_b[0];
   assign CommandRead = Command_b[1];
   assign CommandWrite = Command_b[2];
   assign CommandStart = Command_b[3];
@@ -86,7 +86,7 @@ module fosfor_present_top (
   
   // registers
   always @(posedge Clk_ik)
-    if (CommandWriteAddress)
+    if (CommandLatchAddress)
       RegAddress_b = InputData_b;
    
   // ********************************************************
@@ -139,6 +139,7 @@ module fosfor_present_top (
         'h05: OutputData_b = CipherText_b[47:40];
         'h06: OutputData_b = CipherText_b[55:48];
         'h07: OutputData_b = CipherText_b[63:56];
+        
         'h08: OutputData_b = TestRegister_b;
       endcase
     end
