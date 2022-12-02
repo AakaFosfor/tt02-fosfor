@@ -94,37 +94,46 @@ module fosfor_present_top (
   reg [63:0] PlainText_b;
   reg [79:0] Key_b;
   wire [63:0] CipherText_b;
+  reg [7:0] PlainTextEnable_b;
+  reg [9:0] KeyEnable_b;
   
-  // register write 
-  always @(posedge Clk_ik) begin
-    if (CommandWrite) begin
-      case (RegAddress_b)
-        'h00: PlainText_b[ 7: 0] = InputData_b;
-        'h01: PlainText_b[15: 8] = InputData_b;
-        'h02: PlainText_b[23:16] = InputData_b;
-        'h03: PlainText_b[31:24] = InputData_b;
-        'h04: PlainText_b[39:32] = InputData_b;
-        'h05: PlainText_b[47:40] = InputData_b;
-        'h06: PlainText_b[55:48] = InputData_b;
-        'h07: PlainText_b[63:56] = InputData_b;
+  // register write - direct to PRESENT for plaintext and key
+  always @(*) begin
+    PlainTextEnable_b <= 8'h0;
+    PlainText_b <= 64'h0;
+    KeyEnable_b <= 10'h0;
+    Key_b <= 80'h0;
+    case (RegAddress_b)
+      'h00: begin PlainTextEnable_b[0] <= CommandWrite; PlainText_b[ 7: 0] <= InputData_b; end
+      'h01: begin PlainTextEnable_b[1] <= CommandWrite; PlainText_b[15: 8] <= InputData_b; end
+      'h02: begin PlainTextEnable_b[2] <= CommandWrite; PlainText_b[23:16] <= InputData_b; end
+      'h03: begin PlainTextEnable_b[3] <= CommandWrite; PlainText_b[31:24] <= InputData_b; end
+      'h04: begin PlainTextEnable_b[4] <= CommandWrite; PlainText_b[39:32] <= InputData_b; end
+      'h05: begin PlainTextEnable_b[5] <= CommandWrite; PlainText_b[47:40] <= InputData_b; end
+      'h06: begin PlainTextEnable_b[6] <= CommandWrite; PlainText_b[55:48] <= InputData_b; end
+      'h07: begin PlainTextEnable_b[7] <= CommandWrite; PlainText_b[63:56] <= InputData_b; end
+      (`KEY_OFFSET + 0): begin KeyEnable_b[0] <= CommandWrite; Key_b[ 7: 0] <= InputData_b; end
+      (`KEY_OFFSET + 1): begin KeyEnable_b[1] <= CommandWrite; Key_b[15: 8] <= InputData_b; end
+      (`KEY_OFFSET + 2): begin KeyEnable_b[2] <= CommandWrite; Key_b[23:16] <= InputData_b; end
+      (`KEY_OFFSET + 3): begin KeyEnable_b[3] <= CommandWrite; Key_b[31:24] <= InputData_b; end
+      (`KEY_OFFSET + 4): begin KeyEnable_b[4] <= CommandWrite; Key_b[39:32] <= InputData_b; end
+      (`KEY_OFFSET + 5): begin KeyEnable_b[5] <= CommandWrite; Key_b[47:40] <= InputData_b; end
+      (`KEY_OFFSET + 6): begin KeyEnable_b[6] <= CommandWrite; Key_b[55:48] <= InputData_b; end
+      (`KEY_OFFSET + 7): begin KeyEnable_b[7] <= CommandWrite; Key_b[63:56] <= InputData_b; end
+      (`KEY_OFFSET + 8): begin KeyEnable_b[8] <= CommandWrite; Key_b[71:64] <= InputData_b; end
+      (`KEY_OFFSET + 9): begin KeyEnable_b[9] <= CommandWrite; Key_b[79:72] <= InputData_b; end
+    endcase
+  end
 
 `ifdef TEST_REG
-        `TEST_REG_ADDR: TestRegister_b = InputData_b;
-`endif
-      
-        (`KEY_OFFSET + 0): Key_b[ 7: 0] = InputData_b;
-        (`KEY_OFFSET + 1): Key_b[15: 8] = InputData_b;
-        (`KEY_OFFSET + 2): Key_b[23:16] = InputData_b;
-        (`KEY_OFFSET + 3): Key_b[31:24] = InputData_b;
-        (`KEY_OFFSET + 4): Key_b[39:32] = InputData_b;
-        (`KEY_OFFSET + 5): Key_b[47:40] = InputData_b;
-        (`KEY_OFFSET + 6): Key_b[55:48] = InputData_b;
-        (`KEY_OFFSET + 7): Key_b[63:56] = InputData_b;
-        (`KEY_OFFSET + 8): Key_b[71:64] = InputData_b;
-        (`KEY_OFFSET + 9): Key_b[79:72] = InputData_b;
-      endcase
+  // register write - for top level registers
+  always @(posedge Clk_ik) begin
+    if (CommandWrite) begin
+      if (RegAddress_b == `TEST_REG_ADDR)
+        TestRegister_b = InputData_b;
     end
   end
+`endif
   
   // register read
   always @(*) begin
@@ -159,7 +168,9 @@ module fosfor_present_top (
     .CipherText_ob(CipherText_b),
     // controls
     .Start_i(CommandStart),
-    .Ready_o(Ready)
+    .Ready_o(Ready),
+    .TextRegEnable_ib(PlainTextEnable_b),
+    .KeyRegEnable_ib(KeyEnable_b)
   );
 
 endmodule

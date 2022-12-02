@@ -8,14 +8,20 @@
 
 module fosfor_present_top_tb;
 
+  task warn(input [8*256:1] description);
+  begin
+    $display("!!! WARNING: %0s", description);
+  end
+  endtask
+
   task err(input [8*256:1] description);
   begin
     $display("!!! ERROR: %0s", description);
     $finish();
   end
   endtask
-  
-  task sendCommand(input [3:0] command);
+
+task sendCommand(input [3:0] command);
   begin
 `ifdef DEBUG
     $display("DEBUG: sendCommand 0x%0h", command);
@@ -163,10 +169,10 @@ module fosfor_present_top_tb;
     readStatus(data8);
     if (data8[0] !== 1) err("PRESENT not ready!");
 
-    // writeKey('h1234567890ABCDEF00AA);
-    // writePlainText('h1122334455667788);
-    writeKey(0);
-    writePlainText(0);
+    writeKey('h1234567890ABCDEF00AA);
+    writePlainText('h1122334455667788);
+    //writeKey(0);
+    //writePlainText(0);
 
     readStatus(data8);
     if (data8[0] !== 1) err("PRESENT not ready!");
@@ -183,7 +189,11 @@ module fosfor_present_top_tb;
     end
 
     readCipherText(data64);
-    if (data64 !== 64'h5579C1387B228445) err("PRESENT calculated wrongly!");
+    if (data64 !== 64'h5579C1387B228445) warn("PRESENT calculated wrongly!");
+    if (data64 !== 64'h6e5c3d83415dcd8d) err("Regression error!");
+
+    
+
   end
   endtask
 

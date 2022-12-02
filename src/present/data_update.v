@@ -22,7 +22,7 @@ module data_update (
 				.Data_ob(fromSBox[i*4+3:i*4])
 			);
 			// pLayer
-			always @(fromSBox) begin
+			always @(*) begin
 				Data_ob[ 0+i] = fromSBox[0+i*4];
 				Data_ob[16+i] = fromSBox[1+i*4];
 				Data_ob[32+i] = fromSBox[2+i*4];

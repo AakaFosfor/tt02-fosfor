@@ -10,7 +10,9 @@ module core_serial (
 	output [63:0] CipherText_ob,
 	// controls
 	input Start_i,
-	output Ready_o
+	output Ready_o,
+	input [7:0] TextRegEnable_ib,
+	input [9:0] KeyRegEnable_ib
 );
 
 	wire readyInner;
@@ -28,33 +30,43 @@ module core_serial (
 	assign Ready_o = readyInner;
 	assign starting = Start_i & readyInner;
 	assign readyInner = ~running;
-	assign regEnable = running | starting;
+	assign regEnable = running;
 
 	// input muxes
-	assign keyMux = starting ? Key_ib : keyNew;
-	assign dataMux = starting ? PlainText_ib : dataNew;
+	assign keyMux  = (running | starting) ? keyNew : Key_ib;
+	assign dataMux = (running | starting) ? dataNew : PlainText_ib;
 	
-	// Key_ib register
-	register #(
-		.g_Width(80)
-	) i_keyReg (
-		.Clk_ik(Clk_ik),
-		.Reset_ir(Reset_ir),
-		.Data_ib(keyMux),
-		.Data_ob(keyReg),
-		.Enable_i(regEnable)
-	);
+	genvar i;
+
+	// key register
+	generate
+		for (i = 0; i < 10; i = i + 1) begin
+			register #(
+				.g_Width(8)
+			) i_keyReg (
+				.Clk_ik(Clk_ik),
+				.Reset_ir(1'b0),
+				.Data_ib(keyMux[i*8 +: 8]),
+				.Data_ob(keyReg[i*8 +: 8]),
+				.Enable_i(regEnable | KeyRegEnable_ib[i])
+			);
+		end
+	endgenerate
 
 	// data register
-	register #(
-		.g_Width(64)
-	) i_dataReg (
-		.Clk_ik(Clk_ik),
-		.Reset_ir(Reset_ir),
-		.Data_ib(dataMux),
-		.Data_ob(dataReg),
-		.Enable_i(regEnable)
-	);
+	generate
+		for (i = 0; i < 8; i = i + 1) begin
+			register #(
+				.g_Width(8)
+			) i_dataReg (
+				.Clk_ik(Clk_ik),
+				.Reset_ir(1'b0),
+				.Data_ib(dataMux[i*8 +: 8]),
+				.Data_ob(dataReg[i*8 +: 8]),
+				.Enable_i(regEnable | TextRegEnable_ib[i])
+			);
+		end
+	endgenerate
 
 	// key update
 	key_update i_KeyUpdate (
@@ -73,7 +85,7 @@ module core_serial (
 	// counter
 	always @(posedge Clk_ik) begin
 		if (Reset_ir) begin
-			count <= 5'b00001;
+			count <= 5'b00000;
 			running <= 0;
 		end else if (running) begin
 			count <= count + 1;
@@ -82,7 +94,7 @@ module core_serial (
 				running <= 0;
 			end
 		end else if (Start_i) begin
-			count <= 5'b00001;
+			count <= 5'b00000;
 			running <= 1;
 		end
 	end
