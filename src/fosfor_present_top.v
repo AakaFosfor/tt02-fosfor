@@ -12,7 +12,7 @@ module fosfor_present_top (
   wire Reset_ir;
   wire [1:0] Addr_ib;
   wire [3:0] Data_ib;
-  reg [7:0] Data_ob;
+  wire [7:0] Data_ob;
 
   assign Clk_ik = io_in[0];
   assign Reset_ir = io_in[1];
@@ -66,12 +66,7 @@ module fosfor_present_top (
   assign Status_b = {7'b0, Ready};
 
   // read
-  always @(posedge Clk_ik) begin
-    case (Addr_ib[1])
-      0: Data_ob = Status_b;
-      1: Data_ob = OutputData_b;
-    endcase
-  end
+  assign Data_ob = Addr_ib[1] ? OutputData_b : Status_b;
    
   // write
   always @(posedge Clk_ik) begin
@@ -132,11 +127,7 @@ module fosfor_present_top (
   end
   
   // register read
-  always @(RegAddress_b, CipherText_b
-`ifdef TEST_REG
-      , TestRegister_b
-`endif
-  ) begin
+  always @(*) begin
     case (RegAddress_b)
       'h00: OutputData_b = CipherText_b[ 7: 0];
       'h01: OutputData_b = CipherText_b[15: 8];
