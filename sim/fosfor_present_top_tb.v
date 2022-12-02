@@ -4,19 +4,9 @@
 //`define DEBUG
 `define LOG
 
-//`define TEST_TEST_REG
+`include "defines.vh"
 
 module fosfor_present_top_tb;
-
-  localparam ADDR_IDLE = 2'b00;
-  localparam ADDR_CMD = 2'b01;
-  localparam ADDR_LOW = 2'b10;
-  localparam ADDR_HIGH = 2'b11;
-
-  localparam CMD_LATCH_ADDRESS = 4'b0001;
-  localparam CMD_READ = 4'b0010;
-  localparam CMD_WRITE = 4'b0100;
-  localparam CMD_START = 4'b1000;
 
   task err(input [8*256:1] description);
   begin
@@ -31,10 +21,10 @@ module fosfor_present_top_tb;
     $display("DEBUG: sendCommand 0x%0h", command);
 `endif
     @(posedge Clk_k);
-    Address_b = ADDR_CMD;
+    Address_b = `ADDR_CMD;
     DataIn_b = command;
     @(posedge Clk_k);
-    Address_b = ADDR_IDLE;
+    Address_b = `ADDR_IDLE;
   end
   endtask
     
@@ -44,13 +34,13 @@ module fosfor_present_top_tb;
     $display("DEBUG: sendData 0x%0h", data);
 `endif
     @(posedge Clk_k);
-    Address_b = ADDR_LOW;
+    Address_b = `ADDR_LOW;
     DataIn_b = data[3:0];
     @(posedge Clk_k);
-    Address_b = ADDR_HIGH;
+    Address_b = `ADDR_HIGH;
     DataIn_b = data[7:4];
     @(posedge Clk_k);
-    Address_b = ADDR_IDLE;
+    Address_b = `ADDR_IDLE;
   end
   endtask
   
@@ -60,9 +50,9 @@ module fosfor_present_top_tb;
     $display("DEBUG: receiveData");
 `endif
     @(posedge Clk_k);
-    Address_b = ADDR_LOW;
+    Address_b = `ADDR_LOW;
     @(posedge Clk_k);
-    Address_b = ADDR_IDLE;
+    Address_b = `ADDR_IDLE;
   end
   endtask
   
@@ -72,9 +62,9 @@ module fosfor_present_top_tb;
     $display("DEBUG: receiveStatus");
 `endif
     @(posedge Clk_k);
-    Address_b = ADDR_IDLE;
+    Address_b = `ADDR_IDLE;
     @(posedge Clk_k);
-    Address_b = ADDR_IDLE;
+    Address_b = `ADDR_IDLE;
   end
   endtask
   
@@ -84,9 +74,9 @@ module fosfor_present_top_tb;
     $display("WRITE [0x%0h] = 0x%0h", address, data);
 `endif
     sendData(address);
-    sendCommand(CMD_LATCH_ADDRESS);
+    sendCommand(`CMD_LATCH_ADDRESS);
     sendData(data);
-    sendCommand(CMD_WRITE);
+    sendCommand(`CMD_WRITE);
   end
   endtask
 
@@ -96,8 +86,7 @@ module fosfor_present_top_tb;
     $display("READ [0x%0h]", address);
 `endif
     sendData(address);
-    sendCommand(CMD_LATCH_ADDRESS);
-    sendCommand(CMD_READ);
+    sendCommand(`CMD_LATCH_ADDRESS);
     receiveData();
 `ifdef LOG
     $display("READ [0x%0h] = 0x%0h", address, DataOut_b);
@@ -161,7 +150,7 @@ module fosfor_present_top_tb;
 
   task startPRESENT;
   begin
-    sendCommand(CMD_START);
+    sendCommand(`CMD_START);
   end
   endtask
 
@@ -210,7 +199,7 @@ module fosfor_present_top_tb;
     @(negedge Reset_r);
     @(posedge Clk_k);
 
-`ifdef TEST_TEST_REG
+`ifdef TEST_REG
     // test test register write/read
     write(8, 'hA5);
     read(8, data8);

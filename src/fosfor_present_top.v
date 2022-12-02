@@ -1,7 +1,7 @@
 `default_nettype none
 `timescale 1ns/1ps
 
-// `define TEST_REG
+`include "defines.vh"
 
 module fosfor_present_top (
   input [7:0] io_in,
@@ -29,7 +29,7 @@ module fosfor_present_top (
       
       command (self clearing):
       bit 0 - latch address from input
-      bit 1 - read register
+      bit 1 - (reserved)
       bit 2 - write register
       bit 3 - start PRESENT engine
       
@@ -53,7 +53,6 @@ module fosfor_present_top (
   
   reg [3:0] Command_b; // self-clearing
   wire CommandLatchAddress;
-  wire CommandRead;
   wire CommandWrite;
   wire CommandStart;
   wire [7:0] Status_b;
@@ -61,11 +60,10 @@ module fosfor_present_top (
   reg [7:0] OutputData_b;
   reg [7:0] RegAddress_b;
   
-  assign CommandLatchAddress = Command_b[0];
-  assign CommandRead = Command_b[1];
-  assign CommandWrite = Command_b[2];
-  assign CommandStart = Command_b[3];
-  assign Status_b = {6'b0, Ready};
+  assign CommandLatchAddress = Command_b[`CMD_LATCH_ADDRESS_BIT];
+  assign CommandWrite = Command_b[`CMD_WRITE_BIT];
+  assign CommandStart = Command_b[`CMD_START_BIT];
+  assign Status_b = {7'b0, Ready};
 
   // read
   always @(posedge Clk_ik) begin
@@ -79,10 +77,10 @@ module fosfor_present_top (
   always @(posedge Clk_ik) begin
     Command_b = 0; // self clearing
     case (Addr_ib)
-      // 0: ; IDLE
-      1: Command_b = Data_ib;
-      2: InputData_b[3:0] = Data_ib;
-      3: InputData_b[7:4] = Data_ib;
+      // `ADDR_IDLE: ; IDLE
+      `ADDR_CMD: Command_b = Data_ib;
+      `ADDR_LOW: InputData_b[3:0] = Data_ib;
+      `ADDR_HIGH: InputData_b[7:4] = Data_ib;
     endcase
   end
   
@@ -134,23 +132,25 @@ module fosfor_present_top (
   end
   
   // register read
-  always @(posedge Clk_ik) begin
-    if (CommandRead) begin
-      case (RegAddress_b)
-        'h00: OutputData_b = CipherText_b[ 7: 0];
-        'h01: OutputData_b = CipherText_b[15: 8];
-        'h02: OutputData_b = CipherText_b[23:16];
-        'h03: OutputData_b = CipherText_b[31:24];
-        'h04: OutputData_b = CipherText_b[39:32];
-        'h05: OutputData_b = CipherText_b[47:40];
-        'h06: OutputData_b = CipherText_b[55:48];
-        'h07: OutputData_b = CipherText_b[63:56];
+  always @(RegAddress_b, CipherText_b
+`ifdef TEST_REG
+      , TestRegister_b
+`endif
+  ) begin
+    case (RegAddress_b)
+      'h00: OutputData_b = CipherText_b[ 7: 0];
+      'h01: OutputData_b = CipherText_b[15: 8];
+      'h02: OutputData_b = CipherText_b[23:16];
+      'h03: OutputData_b = CipherText_b[31:24];
+      'h04: OutputData_b = CipherText_b[39:32];
+      'h05: OutputData_b = CipherText_b[47:40];
+      'h06: OutputData_b = CipherText_b[55:48];
+      'h07: OutputData_b = CipherText_b[63:56];
         
 `ifdef TEST_REG
-        'h08: OutputData_b = TestRegister_b;
+      'h08: OutputData_b = TestRegister_b;
 `endif
-      endcase
-    end
+    endcase
   end
 
   // ********************************************************

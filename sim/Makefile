@@ -7,8 +7,9 @@ RTL_SRC := \
 	../src/present/key_update.v \
 	../src/present/core_serial.v \
 	../src/$(TOP_MODULE).v \
-	
+
 TB_SRC := $(TOP_MODULE)_tb.v
+INC_SRC := ../src/defines.vh
 SRC := $(RTL_SRC) $(TB_SRC)
 
 .PHONY: all
@@ -17,9 +18,9 @@ SRC := $(RTL_SRC) $(TB_SRC)
 
 all: display
 
-$(PROJECT): $(SRC)
+$(PROJECT): $(SRC) $(INC_SRC)
 	@echo Compiling...
-	iverilog -Wall -Wno-timescale -o $(PROJECT) $(SRC)
+	iverilog -Wall -Wno-timescale -I../src/ -o $(PROJECT) $(SRC)
 
 $(TOP_MODULE)_tb.vcd: $(PROJECT)
 	@echo Simulating...
