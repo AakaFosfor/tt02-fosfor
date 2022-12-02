@@ -16,6 +16,9 @@
 `define CMD_WRITE (1<<`CMD_WRITE_BIT)
 `define CMD_START (1<<`CMD_START_BIT)
 
+`define TEST_REG_ADDR 8'h08
+`define KEY_OFFSET 8'h10
+
 // comment to not include a test register
 `define TEST_REG
 

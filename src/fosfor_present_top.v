@@ -109,19 +109,19 @@ module fosfor_present_top (
         'h07: PlainText_b[63:56] = InputData_b;
 
 `ifdef TEST_REG
-        'h08: TestRegister_b = InputData_b;
+        `TEST_REG_ADDR: TestRegister_b = InputData_b;
 `endif
       
-        'h10: Key_b[ 7: 0] = InputData_b;
-        'h11: Key_b[15: 8] = InputData_b;
-        'h12: Key_b[23:16] = InputData_b;
-        'h13: Key_b[31:24] = InputData_b;
-        'h14: Key_b[39:32] = InputData_b;
-        'h15: Key_b[47:40] = InputData_b;
-        'h16: Key_b[55:48] = InputData_b;
-        'h17: Key_b[63:56] = InputData_b;
-        'h18: Key_b[71:64] = InputData_b;
-        'h19: Key_b[79:72] = InputData_b;
+        (`KEY_OFFSET + 0): Key_b[ 7: 0] = InputData_b;
+        (`KEY_OFFSET + 1): Key_b[15: 8] = InputData_b;
+        (`KEY_OFFSET + 2): Key_b[23:16] = InputData_b;
+        (`KEY_OFFSET + 3): Key_b[31:24] = InputData_b;
+        (`KEY_OFFSET + 4): Key_b[39:32] = InputData_b;
+        (`KEY_OFFSET + 5): Key_b[47:40] = InputData_b;
+        (`KEY_OFFSET + 6): Key_b[55:48] = InputData_b;
+        (`KEY_OFFSET + 7): Key_b[63:56] = InputData_b;
+        (`KEY_OFFSET + 8): Key_b[71:64] = InputData_b;
+        (`KEY_OFFSET + 9): Key_b[79:72] = InputData_b;
       endcase
     end
   end
@@ -139,7 +139,7 @@ module fosfor_present_top (
       'h07: OutputData_b = CipherText_b[63:56];
         
 `ifdef TEST_REG
-      'h08: OutputData_b = TestRegister_b;
+      `TEST_REG_ADDR: OutputData_b = TestRegister_b;
 `endif
     endcase
   end

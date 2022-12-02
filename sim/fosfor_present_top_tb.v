@@ -115,7 +115,7 @@ module fosfor_present_top_tb;
     $display("WRITE key = 0x%0h", key);
 `endif
     for (i = 0; i < 10; i = i+1) begin
-      write('h10 + i, key[i*8 +: 8]);
+      write(`KEY_OFFSET + i, key[i*8 +: 8]);
     end
   end
   endtask
@@ -201,8 +201,8 @@ module fosfor_present_top_tb;
 
 `ifdef TEST_REG
     // test test register write/read
-    write(8, 'hA5);
-    read(8, data8);
+    write(`TEST_REG_ADDR, 'hA5);
+    read(`TEST_REG_ADDR, data8);
     if (data8 !== 'hA5) err("wrong test register read!");
     #20;
 `endif
