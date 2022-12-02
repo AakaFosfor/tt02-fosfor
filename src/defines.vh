@@ -20,6 +20,6 @@
 `define KEY_OFFSET 8'h10
 
 // comment to not include a test register
-`define TEST_REG
+// `define TEST_REG
 
 `endif
